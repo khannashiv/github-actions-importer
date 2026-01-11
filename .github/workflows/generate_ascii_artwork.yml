@@ -1,0 +1,40 @@
+name: Generate_ASCII_Artwork
+on:
+  workflow_dispatch:
+env:
+#   # TimestamperBuildWrapper was not converted because the behavior is available by default in GitHub Actions and/or it is not configurable
+jobs:
+  build:
+    runs-on:
+      - ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    - name: run command
+      shell: bash
+      run: |-
+        #!/bin/bash
+        set -e  # Exit immediately on error
+        # Build Stage
+        # Fix PATH first (for Jenkins, because Jenkins PATH doesn't include /usr/games)
+        export PATH=$PATH:/usr/games:/usr/local/games
+        # Fetch advice from the API
+        curl -s https://api.adviceslip.com/advice > advice.json
+        # Extract advice text
+        jq -r .slip.advice advice.json > advice.message
+        # Test Stage — ensure the advice message has more than 5 words
+        word_count=$(wc -w < advice.message)
+        if [ "$word_count" -gt 5 ]; then
+          echo "Advice has more than 5 words"
+        else
+          echo "Advice $(cat advice.message) has 5 words or less"
+        fi
+        # Deploy Stage — ensure cowsay is installed
+        if ! command -v cowsay &> /dev/null; then
+          echo "Error: cowsay is not installed. Please run: sudo apt-get install cowsay -y"
+          exit 1
+        fi
+        # Display advice with cowsay
+                  cowsay "$(cat advice.message)"
+              echo "Successfully updated the content of xml downloaded locally."
+#     # Mailer plugin was not converted because GitHub Actions will email the actor after failed build and does not support emailing a list of recipients
