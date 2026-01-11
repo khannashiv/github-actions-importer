@@ -3,7 +3,6 @@ on:
   push:
   workflow_dispatch:
 # env:
-#   # TimestamperBuildWrapper was not converted because the behavior is available by default in GitHub Actions and/or it is not configurable
 jobs:
   build:
     runs-on:
